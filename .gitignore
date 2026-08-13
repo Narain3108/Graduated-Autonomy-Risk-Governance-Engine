@@ -72,3 +72,11 @@ venv.bak/
 
 # macOS
 .DS_Store
+
+# AWS SAM and Deploy Artifacts
+.aws-sam/
+sam_build_src/
+sam-installation/
+aws-sam-cli-linux-x86_64.zip
+awscliv2.zip
+package/

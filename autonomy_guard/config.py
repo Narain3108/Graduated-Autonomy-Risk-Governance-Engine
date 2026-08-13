@@ -21,11 +21,11 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = False
 
-    # ── Database ─────────────────────────────────────────────────────────
-    database_url: str = Field(
-        default="sqlite+aiosqlite:///./autonomy_guard.db",
-        description="Async SQLAlchemy connection string.",
-    )
+    # ── Database (DynamoDB) ──────────────────────────────────────────────
+    table_audit_logs: str = "AutonomyGuard-AuditLogs"
+    table_approval_tickets: str = "AutonomyGuard-ApprovalTickets"
+    table_action_biases: str = "AutonomyGuard-ActionBiases"
+    dynamodb_endpoint: str | None = None  # For local testing if needed
 
     # ── Risk Scoring Weights (must sum to 1.0) ───────────────────────────
     weight_reversibility: float = 0.35
