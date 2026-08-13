@@ -35,7 +35,7 @@ The application is built on FastAPI and uses `uvicorn` as its asynchronous web s
 To start the server in development mode (with auto-reload enabled):
 
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn autonomy_guard.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 You should see logs indicating the application has started and the database has been initialized:
@@ -125,7 +125,7 @@ Any agent running in a separate environment needs to send HTTP POST requests to 
 If the agent is written in Python, you can distribute the SDK found in `app/sdk/decorator.py`. The agent developer would instantiate the SDK client pointing to your server:
 
 ```python
-from app.sdk.decorator import governed_tool, AutonomyGuardClient
+from autonomy_guard.sdk.decorator import governed_tool, AutonomyGuardClient
 
 # 1. Point the SDK to your running server
 governance_client = AutonomyGuardClient(base_url="http://localhost:8000")

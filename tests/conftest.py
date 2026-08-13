@@ -11,10 +11,10 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.config import settings
-from app.db.models import Base
-from app.main import app
-from app.api.dependencies import get_db
+from autonomy_guard.config import settings
+from autonomy_guard.db.models import Base
+from autonomy_guard.main import app
+from autonomy_guard.api.dependencies import get_db
 
 # Override the database URL for tests to use an in-memory SQLite database
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"

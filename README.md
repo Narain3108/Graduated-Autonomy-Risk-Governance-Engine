@@ -42,7 +42,7 @@ pip install -r requirements.txt
 Start the FastAPI server:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn autonomy_guard.main:app --reload
 ```
 
 ## Running Tests
@@ -58,7 +58,7 @@ pytest -v
 Wrap your AI tools with the SDK decorator:
 
 ```python
-from app.sdk.decorator import governed_tool
+from autonomy_guard.sdk.decorator import governed_tool
 
 @governed_tool(
     agent_id="agent-v1",

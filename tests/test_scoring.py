@@ -2,7 +2,7 @@
 
 import pytest
 
-from app.core.scoring import (
+from autonomy_guard.core.scoring import (
     compute_composite_score,
     compute_data_scope_score,
     compute_reversibility_score,

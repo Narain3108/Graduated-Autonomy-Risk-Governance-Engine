@@ -2,8 +2,8 @@
 
 import pytest
 
-from app.core.adaptive import ApprovalOutcome, compute_new_multiplier
-from app.config import Settings
+from autonomy_guard.core.adaptive import ApprovalOutcome, compute_new_multiplier
+from autonomy_guard.config import Settings
 
 
 def test_compute_new_multiplier_approve():

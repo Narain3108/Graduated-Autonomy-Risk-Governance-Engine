@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.models import ActionBias
+from autonomy_guard.db.models import ActionBias
 
 pytestmark = pytest.mark.asyncio
 
