@@ -50,23 +50,56 @@ uvicorn autonomy_guard.main:app --reload
 > Since the database layer natively uses `aioboto3` (DynamoDB), your local machine must have valid AWS credentials configured (`aws configure`) to interact with the remote DynamoDB tables, even when testing locally.
 
 ### 2.3 The SDK Integration
-Developers can integrate AutonomyGuard into their AI agents using the provided SDK.
+
+Other developers can easily integrate AutonomyGuard into their AI agents using the provided Python SDK. 
+
+#### Installation
+To install the SDK, developers can install it directly via pip. Since this acts as a client library, they do not need the server dependencies:
+```bash
+# Install from a local path
+pip install /path/to/autonomy_guard
+
+# Or install directly from your GitHub repository
+pip install git+https://github.com/Narain3108/Graduated-Autonomy-Risk-Governance-Engine.git
+```
+
+#### Usage and Payload Structure
+When an AI agent attempts to execute a tool, the SDK automatically packages the metadata and sends an **Evaluation Payload** to the AWS API Gateway. 
+
+The `@governed_tool` decorator handles this entirely behind the scenes:
 ```python
 from autonomy_guard import AutonomyGuardClient, governed_tool
 
-# Point the client to your deployed AWS API Gateway
+# 1. Point the client to your deployed AWS API Gateway
 client = AutonomyGuardClient(base_url="https://<YOUR_API_ID>.execute-api.us-east-1.amazonaws.com/v1")
 
+# 2. Wrap any AI tool with the governance decorator
 @governed_tool(
     client=client,
     agent_id="my-gemini-agent",
     action_type="WRITE",
-    reversibility=0.1,  # Low reversibility = high risk
-    regulatory_category="FINANCIAL"
+    reversibility=0.1,  # (0.0 to 1.0) Low reversibility = high risk
+    regulatory_category="FINANCIAL" # e.g. PUBLIC, INTERNAL, FINANCIAL
 )
 def execute_sql_query(query: str):
     return run_query(query)
 ```
+
+#### The Evaluation Payload
+When `execute_sql_query` is called by the LLM, the SDK intercepts the call and securely sends the following JSON payload to the `/v1/evaluate` endpoint:
+```json
+{
+  "agent_id": "my-gemini-agent",
+  "action_type": "WRITE",
+  "tool_name": "execute_sql_query",
+  "reversibility": 0.1,
+  "records_affected": 1,
+  "regulatory_category": "FINANCIAL",
+  "llm_confidence": 0.85,
+  "payload_summary": "{\"query\": \"DROP TABLE users;\"}"
+}
+```
+If the AWS Serverless engine returns `AUTONOMOUS`, the decorator immediately runs the SQL query. If it returns `ESCALATED`, the decorator raises a `ToolException` to halt the AI agent and tell it to await human approval.
 
 ---
 
