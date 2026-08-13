@@ -147,6 +147,18 @@ def _register_routes(app: FastAPI) -> None:
             "database": {"connected": True, "type": "dynamodb"},
         }
 
+    @app.get("/", tags=["General"], summary="API Root")
+    async def root() -> dict:
+        """Root endpoint returning basic API metadata."""
+        return {
+            "name": settings.app_name,
+            "version": settings.app_version,
+            "status": "operational",
+            "message": "Welcome to the AutonomyGuard Governance API! See /docs for Swagger documentation.",
+            "health_check": "/healthz",
+            "docs": "/docs"
+        }
+
 
 # ── Module-level app instance (for uvicorn) ─────────────────────────────
 

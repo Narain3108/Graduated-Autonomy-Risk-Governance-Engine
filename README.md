@@ -18,7 +18,7 @@ flowchart TD
 
     subgraph ClientEnv [Client Environment]
         Agent[LLM Agent]
-        SDK[@governed_tool SDK]:::sdk
+        SDK["@governed_tool SDK"]:::sdk
         TargetTool[Actual Function / Tool]
         Blocked[Raises GovernanceException]
     end
