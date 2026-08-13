@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AutonomyGuard: Centralized Graduated Autonomy & Risk Governance Engine
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Environment:
+      Variables:
+        AG_DATABASE_URL: dynamodb
+        AG_TABLE_AUDIT_LOGS: !Ref AuditLogsTable
+        AG_TABLE_APPROVAL_TICKETS: !Ref ApprovalTicketsTable
+        AG_TABLE_ACTION_BIASES: !Ref ActionBiasesTable
+
+Resources:
+  # ── API Gateway & Lambda Function ──────────────────────────────────────────
+  AutonomyGuardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sam_build_src/
+      Handler: autonomy_guard.main.handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AuditLogsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ApprovalTicketsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ActionBiasesTable
+
+  # ── DynamoDB Tables ────────────────────────────────────────────────────────
+  AuditLogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AutonomyGuard-AuditLogs
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  ApprovalTicketsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AutonomyGuard-ApprovalTickets
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  ActionBiasesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AutonomyGuard-ActionBiases
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: action_type
+          AttributeType: S
+      KeySchema:
+        - AttributeName: action_type
+          KeyType: HASH
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"

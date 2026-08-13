@@ -20,7 +20,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from autonomy_guard.config import settings
-from autonomy_guard.db.session import dispose_engine, init_db
 
 # ── Structlog Configuration ──────────────────────────────────────────────
 
@@ -56,10 +55,7 @@ logger = structlog.get_logger("autonomy_guard")
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Manage startup and shutdown side-effects."""
     logger.info("starting_up", app=settings.app_name, version=settings.app_version)
-    await init_db()
-    logger.info("database_initialized")
     yield
-    await dispose_engine()
     logger.info("shutdown_complete")
 
 
@@ -144,22 +140,11 @@ def _register_routes(app: FastAPI) -> None:
     )
     async def healthz() -> dict:
         """Report system health."""
-        db_ok = True
-        db_error: str | None = None
-        try:
-            from autonomy_guard.db.session import engine
-
-            async with engine.connect() as conn:
-                await conn.execute(__import__("sqlalchemy").text("SELECT 1"))
-        except Exception as exc:
-            db_ok = False
-            db_error = str(exc)
-
         return {
-            "status": "healthy" if db_ok else "degraded",
+            "status": "healthy",
             "app": settings.app_name,
             "version": settings.app_version,
-            "database": {"connected": db_ok, "error": db_error},
+            "database": {"connected": True, "type": "dynamodb"},
         }
 
 

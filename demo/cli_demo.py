@@ -8,7 +8,7 @@ from rich import print as rprint
 import time
 
 console = Console()
-BASE_URL = "http://localhost:8000/v1"
+BASE_URL = "https://j8iwpsnxq1.execute-api.us-east-1.amazonaws.com/v1"
 
 async def evaluate_action(client: httpx.AsyncClient, payload: dict) -> dict:
     try:
